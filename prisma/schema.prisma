@@ -32,6 +32,7 @@ model Donation {
   donorName String
   amount    Int
   email     String?
+  message   String?
   reference String   @unique
   status    String   @default("confirmed")
   cause     Cause    @relation(fields: [causeId], references: [id])

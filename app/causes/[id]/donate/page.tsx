@@ -15,6 +15,8 @@ export default function DonatePage() {
   const [customInput, setCustomInput] = useState("");
   const [donorName, setDonorName] = useState("");
   const [donorEmail, setDonorEmail] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +25,8 @@ export default function DonatePage() {
   }, [params.id]);
 
   async function handleDonate() {
-    if (!donorName.trim()) {
+    const finalName = anonymous ? "Anonymous" : donorName.trim();
+    if (!finalName || (finalName === "Anonymous" && !anonymous)) {
       setError("Please enter your name so the donor knows who contributed.");
       return;
     }
@@ -41,8 +44,9 @@ export default function DonatePage() {
           amount,
           causeId: cause!.id,
           causeTitle: cause!.title,
-          donorName: donorName.trim(),
+          donorName: finalName,
           donorEmail: donorEmail.trim() || undefined,
+          message: message.trim() || undefined,
         }),
       });
       if (!res.ok) {
@@ -86,19 +90,38 @@ export default function DonatePage() {
             </div>
 
             <div className="mb-5 space-y-3">
-              <input
-                type="text"
-                placeholder="Your name *"
-                value={donorName}
-                onChange={e => setDonorName(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Your name *"
+                  value={anonymous ? "Anonymous" : donorName}
+                  disabled={anonymous}
+                  onChange={e => setDonorName(e.target.value)}
+                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500 disabled:cursor-not-allowed disabled:bg-stone-50 disabled:text-stone-400"
+                />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-stone-600">
+                <input
+                  type="checkbox"
+                  checked={anonymous}
+                  onChange={e => setAnonymous(e.target.checked)}
+                  className="h-4 w-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                Donate anonymously
+              </label>
               <input
                 type="email"
                 placeholder="Email (for receipt)"
                 value={donorEmail}
                 onChange={e => setDonorEmail(e.target.value)}
                 className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
+              />
+              <textarea
+                placeholder="Leave a message of support (optional)"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                rows={3}
+                className="w-full resize-none rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
               />
             </div>
 

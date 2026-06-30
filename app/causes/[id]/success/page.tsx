@@ -9,10 +9,10 @@ export default async function SuccessPage({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ amount?: string; reference?: string; donor?: string; email?: string }>;
-}) {
+  searchParams: Promise<{ amount?: string; reference?: string; donor?: string; email?: string; message?: string }>;
+>) {
   const { id } = await params;
-  const { amount, reference, donor, email } = await searchParams;
+  const { amount, reference, donor, email, message } = await searchParams;
   const cause = await getCause(id);
   const amountNum = Number(amount ?? 0);
 
@@ -36,6 +36,7 @@ export default async function SuccessPage({
         donorName: donor ?? "Anonymous",
         amount: amountNum,
         email: email || undefined,
+        message: message || undefined,
         reference: ref,
       });
     } catch {
@@ -74,6 +75,12 @@ export default async function SuccessPage({
               <span className="text-stone-500">Status</span>
               <span className="font-medium text-emerald-700">Confirmed</span>
             </div>
+            {message && (
+              <div className="py-2 text-sm">
+                <span className="text-stone-500">Message</span>
+                <p className="mt-1 text-stone-700 italic">&ldquo;{message}&rdquo;</p>
+              </div>
+            )}
           </div>
         </div>
 

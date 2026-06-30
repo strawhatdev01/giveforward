@@ -3,7 +3,7 @@ import { createCheckout } from "@/lib/nomba";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { amount, causeId, causeTitle, donorName, donorEmail } = body;
+  const { amount, causeId, causeTitle, donorName, donorEmail, message } = body;
 
   if (!amount || !causeId) {
     return NextResponse.json({ error: "Missing amount or causeId." }, { status: 400 });
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       donor: donorName || "Anonymous",
     });
     if (donorEmail) params.set("email", donorEmail);
+    if (message) params.set("message", message);
 
     const callbackUrl = `${origin}/causes/${causeId}/success?${params.toString()}`;
 
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
       causeTitle,
       donorName,
       donorEmail,
+      message,
       callbackUrl,
     });
 

@@ -60,6 +60,7 @@ export async function createCheckout(params: {
   causeTitle: string;
   donorName?: string;
   donorEmail?: string;
+  message?: string;
   callbackUrl: string;
 }) {
   const token = await getAccessToken();
@@ -93,6 +94,7 @@ export async function createCheckout(params: {
         donorName: params.donorName || "Anonymous",
         causeTitle: params.causeTitle,
         causeId: params.causeId,
+        message: params.message || "",
       },
     }),
   });

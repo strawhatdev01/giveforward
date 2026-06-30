@@ -74,8 +74,12 @@ export default async function AdminPage() {
           <div className="divide-y divide-stone-100">
             {donations.map((d) => (
               <div key={d.id} className="flex items-center gap-4 px-6 py-3 text-sm">
-                <p className="w-32 font-medium text-stone-900">{d.donorName}</p>
-                <p className="flex-1 truncate text-stone-500">{d.reference}</p>
+                <p className="w-32 truncate font-medium text-stone-900" title={d.donorName}>{d.donorName}</p>
+                <p className="w-40 truncate text-stone-500" title={d.reference}>{d.reference}</p>
+                {d.message && (
+                  <p className="flex-1 truncate text-stone-400 italic" title={d.message}>&ldquo;{d.message}&rdquo;</p>
+                )}
+                {!d.message && <p className="flex-1" />}
                 <p className="font-medium text-emerald-700">{formatNaira(d.amount)}</p>
               </div>
             ))}

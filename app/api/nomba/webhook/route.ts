@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
   const meta = d?.meta ?? {};
   const donorName = meta?.donorName || d?.customer?.name || "Anonymous";
   const donorEmail = d?.order?.customerEmail || meta?.donorEmail;
+  const donorMessage = meta?.message || undefined;
 
   if (!causeId || !amount) {
     console.warn("[webhook] missing causeId or amount — skipping", event);
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
       donorName,
       amount: Math.round(amount),
       email: donorEmail,
+      message: donorMessage,
       reference,
     });
     console.log(`[webhook] recorded donation: ${donorName} — ₦${amount} — ${reference}`);

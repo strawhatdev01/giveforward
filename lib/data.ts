@@ -21,6 +21,8 @@ export type Donation = {
   causeId: string;
   donorName: string;
   amount: number;
+  email?: string;
+  message?: string;
   timestamp: string;
   reference: string;
 };
@@ -60,6 +62,7 @@ export async function createDonation(data: {
   donorName: string;
   amount: number;
   email?: string;
+  message?: string;
   reference: string;
 }) {
   const [donation] = await prisma.$transaction([
