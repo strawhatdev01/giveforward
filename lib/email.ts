@@ -81,19 +81,19 @@ export async function sendReceipt(opts: {
 }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("[email] RESEND_API_KEY not set — skipping receipt");
+    console.warn(`[email] RESEND_API_KEY not set — skipping receipt for ${opts.to}`);
     return;
   }
 
   const { Resend } = await import("resend");
   const resend = new Resend(apiKey);
 
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: FROM,
     to: opts.to,
     subject: `Receipt — ${formatNaira(opts.amount)} donation to ${opts.causeTitle}`,
     html: buildReceiptHtml(opts),
   });
 
-  console.log(`[email] receipt sent to ${opts.to} — ${opts.reference}`);
+  console.log(`[email] receipt sent to ${opts.to} — ${opts.reference}`, result.id);
 }

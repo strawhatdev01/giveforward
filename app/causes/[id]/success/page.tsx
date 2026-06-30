@@ -49,7 +49,7 @@ export default async function SuccessPage({
           reference: ref,
           causeTitle: cause.title,
           message: message || undefined,
-        }).catch(() => {});
+        }).catch((e) => console.error("[email] send failed", e));
       }
     } catch {
       // already recorded via webhook — that's fine
