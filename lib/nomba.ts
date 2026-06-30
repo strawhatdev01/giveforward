@@ -66,6 +66,19 @@ export async function createCheckout(params: {
 
   const orderRef = `${params.causeId}-${Date.now()}`;
 
+  const subAccountId = process.env.NOMBA_SUB_ACCOUNT_ID;
+
+  const order: Record<string, unknown> = {
+    orderReference: orderRef,
+    callbackUrl: params.callbackUrl,
+    customerEmail: params.donorEmail || "donor@giveforward.app",
+    customerName: params.donorName || "Anonymous",
+    amount: params.amount.toString(),
+    currency: "NGN",
+  };
+
+  if (subAccountId) order.accountId = subAccountId;
+
   const res = await fetch(`${NOMBA_BASE_URL}/checkout/order`, {
     method: "POST",
     headers: {
@@ -74,13 +87,7 @@ export async function createCheckout(params: {
       accountId: process.env.NOMBA_ACCOUNT_ID ?? "",
     },
     body: JSON.stringify({
-      order: {
-        orderReference: orderRef,
-        callbackUrl: params.callbackUrl,
-        customerEmail: params.donorEmail || "donor@giveforward.app",
-        amount: params.amount.toString(),
-        currency: "NGN",
-      },
+      order,
       // attach donor info so we can reference it on the success page
       meta: {
         donorName: params.donorName || "Anonymous",

@@ -32,16 +32,24 @@ export async function POST(req: NextRequest) {
       callbackUrl,
     });
 
-    // Nomba returns the checkout link inside the response — dig it out
-    // regardless of which nesting they use
+    console.log("[checkout] Nomba response:", JSON.stringify(checkout));
+
+    if (checkout?.code !== "00") {
+      throw new Error(`Nomba returned code ${checkout?.code}: ${checkout?.description}`);
+    }
+
     const checkoutUrl =
-      checkout?.data?.checkoutUrl ??
-      checkout?.checkoutUrl ??
+      checkout?.data?.checkoutLink ??
+      checkout?.data?.checkout_url ??
       checkout?.data?.link ??
       checkout?.data?.url ??
       null;
 
     const reference = checkout?.data?.orderReference ?? checkout?.data?.reference ?? null;
+
+    if (!checkoutUrl) {
+      throw new Error("Nomba returned no checkout link in response");
+    }
 
     return NextResponse.json({ checkoutUrl, reference });
   } catch (err) {
