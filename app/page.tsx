@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getCauses, getStats, formatNaira } from "@/lib/data";
 import Header from "@/components/header";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [causes, stats] = await Promise.all([getCauses(), getStats()]);
 

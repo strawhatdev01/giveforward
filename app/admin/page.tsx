@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getCauses, getStats, getDonations, formatNaira } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const [causes, stats, donations] = await Promise.all([getCauses(), getStats(), getDonations()]);
 
