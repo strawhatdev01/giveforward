@@ -69,6 +69,20 @@ export async function createDonation(data: {
   return donation;
 }
 
+export async function createCause(data: {
+  title: string;
+  org: string;
+  category: string;
+  emoji: string;
+  goal: number;
+  daysLeft: number;
+  story: string;
+  accountNumber: string;
+  bankName: string;
+}) {
+  return prisma.cause.create({ data: { ...data, raised: 0, donorCount: 0, verified: true } });
+}
+
 export async function getStats() {
   const [totalRaised, totalDonors, causeCount] = await Promise.all([
     prisma.cause.aggregate({ _sum: { raised: true } }),

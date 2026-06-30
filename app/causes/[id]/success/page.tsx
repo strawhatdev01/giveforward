@@ -1,17 +1,31 @@
 import Link from "next/link";
-import { getCause, formatNaira } from "@/lib/data";
+import { getCause, createDonation, formatNaira } from "@/lib/data";
 
 export default async function SuccessPage({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ amount?: string; reference?: string }>;
+  searchParams: Promise<{ amount?: string; reference?: string; donor?: string; email?: string }>;
 }) {
   const { id } = await params;
-  const { amount, reference } = await searchParams;
+  const { amount, reference, donor, email } = await searchParams;
   const cause = await getCause(id);
   const amountNum = Number(amount ?? 0);
   const ref = reference ?? `GF-${Date.now().toString(36).toUpperCase()}`;
+
+  if (cause && amountNum > 0) {
+    try {
+      await createDonation({
+        causeId: id,
+        donorName: donor ?? "Anonymous",
+        amount: amountNum,
+        email: email || undefined,
+        reference: ref,
+      });
+    } catch {
+      // duplicate reference — donation already recorded via webhook
+    }
+  }
 
   if (!cause) return null;
 

@@ -12,6 +12,9 @@ export default async function AdminPage() {
             <Link href="/" className="text-sm text-stone-500 hover:text-emerald-700">← Home</Link>
             <span className="text-lg font-bold text-stone-900">Admin</span>
           </div>
+          <Link href="/admin/create" className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+            + New cause
+          </Link>
         </div>
       </header>
 
@@ -52,6 +55,9 @@ export default async function AdminPage() {
                     <p className="font-medium text-stone-900">{formatNaira(cause.raised)}</p>
                     <p className="text-sm text-stone-500">of {formatNaira(cause.goal)}</p>
                   </div>
+                  <Link href={`/causes/${cause.id}`} className="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 hover:bg-stone-50">
+                    View
+                  </Link>
                 </div>
               );
             })}
@@ -59,17 +65,21 @@ export default async function AdminPage() {
         </div>
 
         <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200">
-          <div className="border-b border-stone-200 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-stone-200 px-6 py-4">
             <h2 className="text-lg font-semibold text-stone-900">Recent donations</h2>
+            <span className="text-xs text-stone-400">{donations.length} total</span>
           </div>
           <div className="divide-y divide-stone-100">
             {donations.map((d) => (
               <div key={d.id} className="flex items-center gap-4 px-6 py-3 text-sm">
                 <p className="w-32 font-medium text-stone-900">{d.donorName}</p>
-                <p className="flex-1 text-stone-500">{d.reference}</p>
+                <p className="flex-1 truncate text-stone-500">{d.reference}</p>
                 <p className="font-medium text-emerald-700">{formatNaira(d.amount)}</p>
               </div>
             ))}
+            {donations.length === 0 && (
+              <p className="px-6 py-6 text-center text-sm text-stone-400">No donations yet</p>
+            )}
           </div>
         </div>
       </main>

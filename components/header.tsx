@@ -10,7 +10,6 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/" className="font-medium text-stone-600 hover:text-emerald-700">Causes</Link>
-          <Link href="/admin" className="font-medium text-stone-600 hover:text-emerald-700">Admin</Link>
         </nav>
       </div>
     </header>

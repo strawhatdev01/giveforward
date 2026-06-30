@@ -13,6 +13,8 @@ export default function DonatePage() {
   const [cause, setCause] = useState<Cause | null>(null);
   const [amount, setAmount] = useState<number>(1000);
   const [customInput, setCustomInput] = useState("");
+  const [donorName, setDonorName] = useState("");
+  const [donorEmail, setDonorEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,23 +23,30 @@ export default function DonatePage() {
   }, [params.id]);
 
   async function handleDonate() {
+    if (!donorName.trim()) { setError("Please enter your name"); return; }
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/nomba/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, causeId: cause!.id, causeTitle: cause!.title }),
+        body: JSON.stringify({
+          amount,
+          causeId: cause!.id,
+          causeTitle: cause!.title,
+          donorName: donorName.trim(),
+          donorEmail: donorEmail.trim() || undefined,
+        }),
       });
       if (!res.ok) throw new Error("Checkout failed");
       const data = await res.json();
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        router.push(`/causes/${cause!.id}/success?amount=${amount}`);
+        router.push(`/causes/${cause!.id}/success?amount=${amount}&donor=${encodeURIComponent(donorName)}&email=${encodeURIComponent(donorEmail)}`);
       }
     } catch {
-      router.push(`/causes/${cause!.id}/success?amount=${amount}`);
+      router.push(`/causes/${cause!.id}/success?amount=${amount}&donor=${encodeURIComponent(donorName)}&email=${encodeURIComponent(donorEmail)}`);
     } finally {
       setLoading(false);
     }
@@ -63,6 +72,23 @@ export default function DonatePage() {
                 <p className="font-medium text-stone-900">{cause.title}</p>
                 <p className="text-sm text-stone-500">{cause.org}</p>
               </div>
+            </div>
+
+            <div className="mb-5 space-y-3">
+              <input
+                type="text"
+                placeholder="Your name *"
+                value={donorName}
+                onChange={e => setDonorName(e.target.value)}
+                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+              />
+              <input
+                type="email"
+                placeholder="Email (for receipt)"
+                value={donorEmail}
+                onChange={e => setDonorEmail(e.target.value)}
+                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+              />
             </div>
 
             <label className="mb-3 block text-sm font-medium text-stone-700">Choose an amount</label>
