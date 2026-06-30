@@ -51,6 +51,8 @@ export async function getDonations(causeId?: string): Promise<Donation[]> {
   });
   return donations.map((d) => ({
     ...d,
+    email: d.email ?? undefined,
+    message: d.message ?? undefined,
     timestamp: timeAgo(d.createdAt),
   }));
 }
