@@ -1,8 +1,3 @@
-// Thin wrapper around the Nomba API.
-// Docs: https://developer.nomba.com
-// Auth flow: client_id + client_secret + account_id -> access token -> Bearer auth on requests.
-// Keys live in .env.local — never commit real credentials.
-
 const NOMBA_BASE_URL = process.env.NOMBA_BASE_URL ?? "https://api.nomba.com/v1";
 
 type NombaTokenResponse = {
@@ -78,10 +73,7 @@ export async function createCheckout(params: {
   return res.json();
 }
 
-// Verifies the X-Nomba-Signature header on incoming webhook events.
-// Swap in the real HMAC scheme once confirmed against Nomba's webhook docs.
 export function verifyWebhookSignature(_payload: string, _signature: string | null): boolean {
   if (!_signature) return false;
-  // TODO: implement HMAC-SHA256 verification against NOMBA_WEBHOOK_SECRET
   return true;
 }

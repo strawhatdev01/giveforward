@@ -1,8 +1,10 @@
+import { prisma } from "./db";
+
 export type Cause = {
   id: string;
   title: string;
   org: string;
-  category: "Water" | "Education" | "Mosque" | "Church" | "Healthcare";
+  category: string;
   emoji: string;
   goal: number;
   raised: number;
@@ -23,65 +25,72 @@ export type Donation = {
   reference: string;
 };
 
-export const causes: Cause[] = [
-  {
-    id: "musa-water",
-    title: "Help Musa's community get clean water",
-    org: "Kano State Community Trust",
-    category: "Water",
-    emoji: "💧",
-    goal: 1000000,
-    raised: 450000,
-    donorCount: 147,
-    daysLeft: 18,
-    verified: true,
-    story:
-      "Musa's village in Kano State has walked over 4km daily for clean water for the past decade. This campaign funds a borehole and water pump serving over 500 families, giving children time to attend school instead of fetching water.",
-    accountNumber: "9012345678",
-    bankName: "Nomba MFB",
-  },
-  {
-    id: "girls-scholarship",
-    title: "Scholarship fund for 50 rural girls",
-    org: "Educate Africa Initiative",
-    category: "Education",
-    emoji: "📚",
-    goal: 1000000,
-    raised: 720000,
-    donorCount: 203,
-    daysLeft: 9,
-    verified: true,
-    story:
-      "Fifty girls across rural Kaduna and Niger states risk dropping out of secondary school due to unpaid fees. This fund covers a full academic year of tuition, books, and uniforms.",
-    accountNumber: "9012345679",
-    bankName: "Nomba MFB",
-  },
-  {
-    id: "masjid-rebuild",
-    title: "Rebuild Masjid Al-Noor — Lagos",
-    org: "Lagos Muslim Community",
-    category: "Mosque",
-    emoji: "🕌",
-    goal: 2000000,
-    raised: 1200000,
-    donorCount: 318,
-    daysLeft: 25,
-    verified: true,
-    story:
-      "Masjid Al-Noor was damaged in seasonal flooding and has been closed for repairs. This campaign rebuilds the prayer hall and ablution area so the community can return.",
-    accountNumber: "9012345680",
-    bankName: "Nomba MFB",
-  },
-];
+export async function getCauses(): Promise<Cause[]> {
+  const causes = await prisma.cause.findMany({ orderBy: { createdAt: "desc" } });
+  return causes.map((c) => ({ ...c, category: c.category }));
+}
 
-export const donations: Donation[] = [
-  { id: "d1", causeId: "musa-water", donorName: "Ahmed", amount: 5000, timestamp: "2 minutes ago", reference: "GF-2026-08471" },
-  { id: "d2", causeId: "musa-water", donorName: "Sarah A.", amount: 10000, timestamp: "15 minutes ago", reference: "GF-2026-08465" },
-  { id: "d3", causeId: "musa-water", donorName: "Anonymous", amount: 2000, timestamp: "1 hour ago", reference: "GF-2026-08452" },
-];
+export async function getCause(id: string): Promise<Cause | null> {
+  const c = await prisma.cause.findUnique({ where: { id } });
+  if (!c) return null;
+  return { ...c, category: c.category };
+}
 
-export function getCause(id: string): Cause | undefined {
-  return causes.find((c) => c.id === id);
+export async function getDonations(causeId?: string): Promise<Donation[]> {
+  const where = causeId ? { causeId } : {};
+  const donations = await prisma.donation.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+  return donations.map((d) => ({
+    ...d,
+    timestamp: timeAgo(d.createdAt),
+  }));
+}
+
+export async function createDonation(data: {
+  causeId: string;
+  donorName: string;
+  amount: number;
+  email?: string;
+  reference: string;
+}) {
+  const [donation] = await prisma.$transaction([
+    prisma.donation.create({ data }),
+    prisma.cause.update({
+      where: { id: data.causeId },
+      data: {
+        raised: { increment: data.amount },
+        donorCount: { increment: 1 },
+      },
+    }),
+  ]);
+  return donation;
+}
+
+export async function getStats() {
+  const [totalRaised, totalDonors, causeCount] = await Promise.all([
+    prisma.cause.aggregate({ _sum: { raised: true } }),
+    prisma.cause.aggregate({ _sum: { donorCount: true } }),
+    prisma.cause.count(),
+  ]);
+  return {
+    totalRaised: totalRaised._sum.raised ?? 0,
+    totalDonors: totalDonors._sum.donorCount ?? 0,
+    causeCount,
+  };
+}
+
+function timeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
 export function formatNaira(amount: number): string {
