@@ -32,8 +32,6 @@ export async function POST(req: NextRequest) {
       callbackUrl,
     });
 
-    console.log("[checkout] Nomba response:", JSON.stringify(checkout));
-
     if (checkout?.code !== "00") {
       throw new Error(`Nomba returned code ${checkout?.code}: ${checkout?.description}`);
     }
@@ -48,7 +46,11 @@ export async function POST(req: NextRequest) {
     const reference = checkout?.data?.orderReference ?? checkout?.data?.reference ?? null;
 
     if (!checkoutUrl) {
-      throw new Error("Nomba returned no checkout link in response");
+      return NextResponse.json({
+        checkoutUrl: null,
+        reference: null,
+        debug: checkout,
+      });
     }
 
     return NextResponse.json({ checkoutUrl, reference });

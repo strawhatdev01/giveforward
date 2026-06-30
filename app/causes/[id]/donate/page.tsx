@@ -51,11 +51,9 @@ export default function DonatePage() {
       }
       const data = await res.json();
       if (data.checkoutUrl) {
-        // off to Nomba's hosted payment page
         window.location.href = data.checkoutUrl;
       } else {
-        // Nomba didn't return a checkout link — probably sandbox is still being set up
-        router.push(`/causes/${cause!.id}/success?amount=${amount}&donor=${encodeURIComponent(donorName)}&email=${encodeURIComponent(donorEmail)}`);
+        setError("Nomba API returned: " + JSON.stringify(data.debug || data));
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong creating your checkout. Check your network and try again.";
