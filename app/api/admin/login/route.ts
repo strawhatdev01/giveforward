@@ -1,7 +1,28 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const MAX_ATTEMPTS = 5;
+const attempts = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return false;
+  }
+  entry.count++;
+  if (entry.count > MAX_ATTEMPTS) return true;
+  return false;
+}
+
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+  }
+
   const { email, password } = await req.json();
 
   const expectedEmail = process.env.ADMIN_EMAIL;

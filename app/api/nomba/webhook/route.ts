@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/nomba";
-import { createDonation } from "@/lib/data";
+import { createDonation, getCause } from "@/lib/data";
+import { sendReceipt } from "@/lib/email";
 
 // Nomba sends payment_success events here after a customer completes checkout.
 // We persist the donation to the database so the dashboard updates in real time.
@@ -49,6 +50,20 @@ export async function POST(req: NextRequest) {
       reference,
     });
     console.log(`[webhook] recorded donation: ${donorName} — ₦${amount} — ${reference}`);
+
+    if (donorEmail && causeId) {
+      const cause = await getCause(causeId);
+      if (cause) {
+        sendReceipt({
+          to: donorEmail,
+          donorName,
+          amount: Math.round(amount),
+          reference,
+          causeTitle: cause.title,
+          message: donorMessage,
+        }).catch(() => {});
+      }
+    }
   } catch {
     // duplicate reference — already recorded via the success page callback
   }

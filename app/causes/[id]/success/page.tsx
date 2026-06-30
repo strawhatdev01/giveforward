@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getCause, createDonation, formatNaira } from "@/lib/data";
+import { sendReceipt } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,17 @@ export default async function SuccessPage({
         message: message || undefined,
         reference: ref,
       });
+
+      if (email) {
+        sendReceipt({
+          to: email,
+          donorName: donor ?? "Anonymous",
+          amount: amountNum,
+          reference: ref,
+          causeTitle: cause.title,
+          message: message || undefined,
+        }).catch(() => {});
+      }
     } catch {
       // already recorded via webhook — that's fine
     }
