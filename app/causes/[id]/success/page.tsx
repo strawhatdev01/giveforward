@@ -11,7 +11,7 @@ export default async function SuccessPage({
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ amount?: string; reference?: string; donor?: string; email?: string; message?: string }>;
->) {
+}) {
   const { id } = await params;
   const { amount, reference, donor, email, message } = await searchParams;
   const cause = await getCause(id);
