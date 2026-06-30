@@ -3,6 +3,8 @@ import { getCause, createDonation, formatNaira } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
+// Nomba redirects back here after payment (or we fall through if sandbox isn't wired)
+// we record the donation immediately so the dashboard updates in real time
 export default async function SuccessPage({
   params, searchParams,
 }: {
@@ -13,9 +15,21 @@ export default async function SuccessPage({
   const { amount, reference, donor, email } = await searchParams;
   const cause = await getCause(id);
   const amountNum = Number(amount ?? 0);
-  const ref = reference ?? `GF-${Date.now().toString(36).toUpperCase()}`;
 
-  if (cause && amountNum > 0) {
+  if (!cause) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+        <div className="max-w-md text-center">
+          <p className="text-lg text-red-600">Campaign not found.</p>
+          <Link href="/" className="mt-4 inline-block text-sm text-emerald-600 hover:underline">← Back to causes</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // save the donation if we have the details — duplicate reference is a no-op
+  const ref = reference ?? `GF-${Date.now().toString(36).toUpperCase()}`;
+  if (amountNum > 0) {
     try {
       await createDonation({
         causeId: id,
@@ -25,11 +39,9 @@ export default async function SuccessPage({
         reference: ref,
       });
     } catch {
-      // duplicate reference — donation already recorded via webhook
+      // already recorded via webhook — that's fine
     }
   }
-
-  if (!cause) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
@@ -37,7 +49,8 @@ export default async function SuccessPage({
         <div className="mb-6 flex justify-center">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-4xl">❤️</div>
         </div>
-        <h1 className="text-2xl font-bold text-stone-900">Thank you!</h1>
+
+        <h1 className="text-2xl font-bold text-stone-900">Thank you, {donor || "friend"}!</h1>
         <p className="mt-2 text-stone-500">
           Your donation moves <strong className="text-stone-700">{cause.title}</strong> closer to its goal.
         </p>
@@ -54,7 +67,7 @@ export default async function SuccessPage({
               <span className="font-mono text-xs text-stone-700">{ref}</span>
             </div>
             <div className="flex justify-between py-2 text-sm">
-              <span className="text-stone-500">Cause</span>
+              <span className="text-stone-500">Campaign</span>
               <span className="font-medium text-stone-700">{cause.title}</span>
             </div>
             <div className="flex justify-between py-2 text-sm">
@@ -64,7 +77,14 @@ export default async function SuccessPage({
           </div>
         </div>
 
-        <Link href="/" className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-medium text-white hover:bg-emerald-700">
+        <p className="mt-4 text-xs text-stone-400">
+          {email ? `A receipt will be sent to ${email}.` : "Add an email next time to get a receipt."}
+        </p>
+
+        <Link
+          href="/"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-medium text-white hover:bg-emerald-700"
+        >
           Browse more causes
         </Link>
       </div>

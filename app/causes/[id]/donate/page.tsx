@@ -23,7 +23,14 @@ export default function DonatePage() {
   }, [params.id]);
 
   async function handleDonate() {
-    if (!donorName.trim()) { setError("Please enter your name"); return; }
+    if (!donorName.trim()) {
+      setError("Please enter your name so the donor knows who contributed.");
+      return;
+    }
+    if (amount < 100) {
+      setError("Minimum donation is ₦100.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -38,21 +45,27 @@ export default function DonatePage() {
           donorEmail: donorEmail.trim() || undefined,
         }),
       });
-      if (!res.ok) throw new Error("Checkout failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Server responded with ${res.status}`);
+      }
       const data = await res.json();
       if (data.checkoutUrl) {
+        // off to Nomba's hosted payment page
         window.location.href = data.checkoutUrl;
       } else {
+        // Nomba didn't return a checkout link — probably sandbox is still being set up
         router.push(`/causes/${cause!.id}/success?amount=${amount}&donor=${encodeURIComponent(donorName)}&email=${encodeURIComponent(donorEmail)}`);
       }
-    } catch {
-      router.push(`/causes/${cause!.id}/success?amount=${amount}&donor=${encodeURIComponent(donorName)}&email=${encodeURIComponent(donorEmail)}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Something went wrong creating your checkout. Check your network and try again.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   }
 
-  if (!cause) return <div className="p-8 text-center text-stone-500">Loading...</div>;
+  if (!cause) return <div className="flex min-h-screen items-center justify-center text-stone-500">Loading campaign details…</div>;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -80,14 +93,14 @@ export default function DonatePage() {
                 placeholder="Your name *"
                 value={donorName}
                 onChange={e => setDonorName(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
               />
               <input
                 type="email"
                 placeholder="Email (for receipt)"
                 value={donorEmail}
                 onChange={e => setDonorEmail(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
               />
             </div>
 
@@ -98,7 +111,7 @@ export default function DonatePage() {
                   key={preset}
                   onClick={() => { setAmount(preset); setCustomInput(""); }}
                   className={`rounded-xl border py-3 text-sm font-medium transition ${
-                    amount === preset && !customInput ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-stone-200 text-stone-700 hover:border-stone-300"
+                    amount === preset && !customInput ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-stone-200 bg-white text-stone-700 hover:border-stone-300"
                   }`}
                 >
                   {formatNaira(preset)}
@@ -110,7 +123,7 @@ export default function DonatePage() {
                   placeholder="Custom amount (₦)"
                   value={customInput}
                   onChange={(e) => { setCustomInput(e.target.value); setAmount(Number(e.target.value) || 0); }}
-                  className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-emerald-500"
                 />
               </div>
             </div>
@@ -127,7 +140,11 @@ export default function DonatePage() {
               </div>
             </div>
 
-            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+            {error && (
+              <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             <div className="mt-8">
               <button

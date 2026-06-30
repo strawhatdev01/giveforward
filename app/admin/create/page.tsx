@@ -44,42 +44,42 @@ export default function CreateCausePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Title</label>
-              <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Organization</label>
-              <input value={form.org} onChange={e => setForm(p => ({ ...p, org: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input value={form.org} onChange={e => setForm(p => ({ ...p, org: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Category</label>
-              <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500">
-                {["Education", "Health", "Community", "Emergency", "Environment", "Other"].map(c => <option key={c}>{c}</option>)}
+              <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500">
+                {["Education", "Health", "Community", "Emergency", "Environment", "Other"].map(c => <option key={c} className="text-stone-900">{c}</option>)}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Emoji</label>
-              <input value={form.emoji} onChange={e => setForm(p => ({ ...p, emoji: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input value={form.emoji} onChange={e => setForm(p => ({ ...p, emoji: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Goal (₦)</label>
-              <input type="number" min="1" value={form.goal} onChange={e => setForm(p => ({ ...p, goal: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input type="number" min="1" value={form.goal} onChange={e => setForm(p => ({ ...p, goal: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Days left</label>
-              <input type="number" min="1" value={form.daysLeft} onChange={e => setForm(p => ({ ...p, daysLeft: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input type="number" min="1" value={form.daysLeft} onChange={e => setForm(p => ({ ...p, daysLeft: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Account number</label>
-              <input value={form.accountNumber} onChange={e => setForm(p => ({ ...p, accountNumber: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input value={form.accountNumber} onChange={e => setForm(p => ({ ...p, accountNumber: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-stone-700">Bank name</label>
-              <input value={form.bankName} onChange={e => setForm(p => ({ ...p, bankName: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+              <input value={form.bankName} onChange={e => setForm(p => ({ ...p, bankName: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
             </div>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-stone-700">Story</label>
-            <textarea rows={4} value={form.story} onChange={e => setForm(p => ({ ...p, story: e.target.value }))} required className="w-full rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-emerald-500" />
+            <textarea rows={4} value={form.story} onChange={e => setForm(p => ({ ...p, story: e.target.value }))} required className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 outline-none focus:border-emerald-500" />
           </div>
           <button type="submit" disabled={saving} className="w-full rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50">
             {saving ? "Creating…" : "Create cause"}

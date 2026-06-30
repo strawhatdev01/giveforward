@@ -16,7 +16,7 @@ export default async function CausePage({ params }: { params: Promise<{ id: stri
     <div className="min-h-screen bg-stone-50">
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
-          <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-sm hover:bg-stone-50">
+          <Link href="/" className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-sm text-stone-600 hover:bg-stone-50">
             ←
           </Link>
           <p className="font-medium text-stone-900">Cause details</p>

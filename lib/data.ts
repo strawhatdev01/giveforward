@@ -25,17 +25,21 @@ export type Donation = {
   reference: string;
 };
 
+// pull all causes from the database, newest first
 export async function getCauses(): Promise<Cause[]> {
   const causes = await prisma.cause.findMany({ orderBy: { createdAt: "desc" } });
   return causes.map((c) => ({ ...c, category: c.category }));
 }
 
+// grab a single cause by ID — used on the detail page and donate page
 export async function getCause(id: string): Promise<Cause | null> {
   const c = await prisma.cause.findUnique({ where: { id } });
   if (!c) return null;
   return { ...c, category: c.category };
 }
 
+// recent donations, optionally filtered to a single cause.
+// used on the cause detail page and the admin dashboard.
 export async function getDonations(causeId?: string): Promise<Donation[]> {
   const where = causeId ? { causeId } : {};
   const donations = await prisma.donation.findMany({
@@ -49,6 +53,8 @@ export async function getDonations(causeId?: string): Promise<Donation[]> {
   }));
 }
 
+// record a new donation, update the cause raised + donor count in one go.
+// the reference is unique so duplicate webhook callbacks won't double-count.
 export async function createDonation(data: {
   causeId: string;
   donorName: string;
@@ -69,6 +75,7 @@ export async function createDonation(data: {
   return donation;
 }
 
+// create a new campaign — used by the admin "New cause" form
 export async function createCause(data: {
   title: string;
   org: string;
@@ -83,6 +90,7 @@ export async function createCause(data: {
   return prisma.cause.create({ data: { ...data, raised: 0, donorCount: 0, verified: true } });
 }
 
+// aggregate stats for the homepage and admin dashboard
 export async function getStats() {
   const [totalRaised, totalDonors, causeCount] = await Promise.all([
     prisma.cause.aggregate({ _sum: { raised: true } }),
@@ -90,12 +98,14 @@ export async function getStats() {
     prisma.cause.count(),
   ]);
   return {
+    // fallback to 0 if the database is empty — avoids "null" showing up on the page
     totalRaised: totalRaised._sum.raised ?? 0,
     totalDonors: totalDonors._sum.donorCount ?? 0,
     causeCount,
   };
 }
 
+// relative time helper — turns a Date into "3 minutes ago" etc.
 function timeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   if (seconds < 60) return "just now";
@@ -107,6 +117,7 @@ function timeAgo(date: Date): string {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
+// format a number as Nigerian Naira — e.g. 150000 → ₦150,000
 export function formatNaira(amount: number): string {
   return `₦${amount.toLocaleString("en-NG")}`;
 }
