@@ -95,5 +95,9 @@ export async function sendReceipt(opts: {
     html: buildReceiptHtml(opts),
   });
 
-  console.log(`[email] receipt sent to ${opts.to} — ${opts.reference}`, result.id);
+  if (result.error) {
+    console.warn(`[email] failed to send to ${opts.to} — ${opts.reference}`, result.error);
+  } else {
+    console.log(`[email] receipt sent to ${opts.to} — ${opts.reference}`, result.data?.id);
+  }
 }
