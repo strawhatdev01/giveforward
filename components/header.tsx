@@ -17,7 +17,6 @@ export default function Header() {
         </Link>
         <nav className="flex items-center gap-6 text-sm">
           <button onClick={scrollToCauses} className="font-medium text-stone-600 hover:text-emerald-700 cursor-pointer">Causes</button>
-          <Link href="/admin/login" className="font-medium text-stone-600 hover:text-emerald-700">Admin</Link>
         </nav>
       </div>
     </header>
