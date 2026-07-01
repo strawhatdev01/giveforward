@@ -181,6 +181,7 @@ This complete flow is fully functional end-to-end.
 - [ ] Cause image upload
 - [ ] Campaign editing and management
 - [ ] Donation history for repeat donors
+- [x] Branded email receipts — feature built, pending domain verification on Resend (restricted to sender's own email in test mode). Will be fully active in final stage with verified domain.
 
 ---
 
