@@ -23,8 +23,8 @@ GiveForward connects donors directly with **verified community causes**. Every n
 | Landing page | Browse causes | Cause detail |
 |:---:|:---:|:---:|
 | ![Hero](public/screenshot-hero.png) | ![Causes](public/screenshot-causes.png) | ![Detail](public/screenshot-cause-detail.png) |
-| **Donation flow** | **Success receipt** | **Admin dashboard** |
-| ![Donate](public/screenshot-donate.png) | _Email receipt_ | ![Admin](public/screenshot-admin.png) |
+| **Donation flow** | **Email receipt** | **Admin dashboard** |
+| ![Donate](public/screenshot-donate.png) | ![Email receipt](public/screenshot-email.png) | ![Admin](public/screenshot-admin.png) |
 
 ---
 
